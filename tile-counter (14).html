@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tile Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #tile-container-1, #tile-container-2 {
+            display: grid;
+            grid-template-columns: repeat(34, 50px);
+            grid-template-rows: repeat(9, 50px);
+            gap: 2px;
+            margin-bottom: 20px;
+        }
+        .tile {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            background-color: lightgray;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            font-size: 10px; /* Decreased font size */
+        }
+        .tile input {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 10px; /* Decreased font size */
+            color: black;
+        }
+        .tile.active {
+            background-color: cornflowerblue;
+            color: white;
+        }
+        #total-1, #total-2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .attribute-input {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <label class="attribute-input">Intellect: <input type="number" id="intellect-input" value="1"></label>
+        <label class="attribute-input">Strength: <input type="number" id="strength-input" value="1"></label>
+        <label class="attribute-input">Charisma: <input type="number" id="charisma-input" value="1"></label>
+        <label class="attribute-input">Leadership: <input type="number" id="leadership-input" value="1"></label>
+    </div>
+    <div id="tile-container-1"></div>
+    <div id="total-1">Total Map 1: 0</div>
+    
+    <div id="tile-container-2"></div>
+    <div id="total-2">Total Map 2: 0</div>
+
+    <script>
+        const rows = 9;
+        const columns = 34;
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+        const values = {
+            a: 1000000, b: 1600000, c: 2300000, d: 3000000, e: 6000000, f: 9000000, g: 12000000, h: 15000000, 
+            i: 20000000, j: 25000000, k: 30000000, l: 35000000, m: 46000000, n: 57000000, o: 69000000, p: 82000000, 
+            q: 112000000, r: 140000000, s: 175000000, t: 207000000, u: 260000000, v: 320000000, w: 380000000, x: 440000000
+        };
+
+        const attributeMap = {
+            "a1": "intellect", "a2": "strength", "a3": "leadership", "a4": "intellect", "a5": "empty", "a6": "leadership", "a7": "strength", "a8": "charisma", "a9": "intellect",
+            "b1": "leadership", "b2": "charisma", "b3": "intellect", "b4": "strength", "b5": "charisma", "b6": "intellect", "b7": "strength", "b8": "leadership", "b9": "charisma",
+            "c1": "leadership", "c2": "strength", "c3": "intellect", "c4": "charisma", "c5": "intellect", "c6": "strength", "c7": "leadership", "c8": "intellect", "c9": "strength",
+            "d1": "charisma", "d2": "strength", "d3": "intellect", "d4": "leadership", "d5": "strength", "d6": "intellect", "d7": "charisma", "d8": "leadership", "d9": "charisma",
+            "e1": "charisma", "e2": "charisma", "e3": "intellect", "e4": "strength", "e5": "leadership", "e6": "charisma", "e7": "leadership", "e8": "strength", "e9": "intellect",
+            "f1": "leadership", "f2": "charisma", "f3": "charisma", "f4": "leadership", "f5": "intellect", "f6": "strength", "f7": "strength", "f8": "intellect", "f9": "leadership",
+            "g1": "leadership", "g2": "strength", "g3": "intellect", "g4": "intellect", "g5": "leadership", "g6": "strength", "g7": "charisma", "g8": "intellect", "g9": "strength",
+            "h1": "intellect", "h2": "leadership", "h3": "charisma", "h4": "strength", "h5": "leadership", "h6": "charisma", "h7": "intellect", "h8": "strength", "h9": "charisma",
+            "i1": "leadership", "i2": "charisma", "i3": "strength", "i4": "leadership", "i5": "intellect", "i6": "strength", "i7": "intellect", "i8": "leadership", "i9": "charisma",
+            "j1": "leadership", "j2": "charisma", "j3": "leadership", "j4": "charisma", "j5": "intellect", "j6": "strength", "j7": "charisma", "j8": "intellect", "j9": "strength",
+            "k1": "leadership", "k2": "strength", "k3": "intellect", "k4": "intellect", "k5": "strength", "k6": "charisma", "k7": "leadership", "k8": "intellect", "k9": "strength",
+            "l1": "charisma", "l2": "intellect", "l3": "strength", "l4": "leadership", "l5": "charisma", "l6": "leadership", "l7": "intellect", "l8": "strength", "l9": "charisma",
+            "m1": "strength", "m2": "charisma", "m3": "leadership", "m4": "strength", "m5": "intellect", "m6": "intellect", "m7": "strength", "m8": "charisma", "m9": "leadership",
+            "n1": "intellect", "n2": "strength", "n3": "intellect", "n4": "leadership", "n5": "strength", "n6": "charisma", "n7": "intellect", "n8": "leadership", "n9": "charisma",
+            "o1": "strength", "o2": "leadership", "o3": "intellect", "o4": "strength", "o5": "charisma", "o6": "intellect", "o7": "leadership", "o8": "charisma", "o9": "leadership",
+            "p1": "charisma", "p2": "strength", "p3": "leadership", "p4": "intellect", "p5": "strength", "p6": "charisma", "p7": "intellect", "p8": "leadership", "p9": "charisma",
+            "q1": "strength", "q2": "strength", "q3": "leadership", "q4": "intellect", "q5": "charisma", "q6": "strength", "q7": "charisma", "q8": "intellect", "q9": "leadership",
+            "r1": "charisma", "r2": "leadership", "r3": "charisma", "r4": "intellect", "r5": "leadership", "r6": "strength", "r7": "charisma", "r8": "leadership", "r9": "intellect",
+            "s1": "charisma", "s2": "leadership", "s3": "intellect", "s4": "leadership", "s5": "intellect", "s6": "charisma", "s7": "strength", "s8": "intellect", "s9": "strength",
+            "t1": "leadership", "t2": "intellect", "t3": "strength", "t4": "charisma", "t5": "charisma", "t6": "leadership", "t7": "intellect", "t8": "strength", "t9": "strength",
+            "u1": "leadership", "u2": "strength", "u3": "leadership", "u4": "charisma", "u5": "strength", "u6": "leadership", "u7": "leadership", "u8": "intellect", "u9": "leadership",
+            "v1": "strength", "v2": "charisma", "v3": "strength", "v4": "charisma", "v5": "intellect", "v6": "charisma", "v7": "leadership", "v8": "intellect", "v9": "leadership",
+            "w1": "strength", "w2": "intellect", "w3": "strength", "w4": "charisma", "w5": "charisma", "w6": "strength", "w7": "intellect", "w8": "charisma", "w9": "charisma",
+            "x1": "intellect", "x2": "strength", "x3": "leadership", "x4": "charisma", "x5": "strength", "x6": "intellect", "x7": "leadership", "x8": "intellect", "x9": "leadership"
+        };
+
+        let total1 = 0;
+        let total2 = 0;
+
+        const calculateTotal = (containerId, totalId) => {
+            let total = 0;
+            document.querySelectorAll(`#${containerId} .tile.active`).forEach(tile => {
+                const value = parseInt(tile.dataset.value);
+                const attribute = tile.dataset.attribute;
+                const attributeValue = parseInt(document.getElementById(`${attribute}-input`).value || 1);
+                total += value / (attributeValue || 1);
+            });
+            document.getElementById(totalId).textContent = `Total ${containerId === 'tile-container-1' ? 'Map 1' : 'Map 2'}: ${total}`;
+        };
+
+        const createTiles = (containerId, totalId) => {
+            const tileContainer = document.getElementById(containerId);
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < columns; j++) {
+                    const tile = document.createElement('div');
+                    tile.classList.add('tile');
+                    const row = i + 1;
+                    const column = alphabet[j] || String.fromCharCode(97 + (j - 26));
+                    const coordinate = column + row;
+                    const value = values[column];
+                    const attribute = attributeMap[coordinate];
+                    
+                    tile.dataset.value = value;
+                    tile.dataset.attribute = attribute;
+                    tile.innerHTML = `${coordinate} (${attribute})`;
+                    
+                    tile.addEventListener('click', () => {
+                        if (tile.classList.contains('active')) {
+                            tile.classList.remove('active');
+                        } else {
+                            tile.classList.add('active');
+                        }
+                        calculateTotal(containerId, totalId);
+                    });
+                    tileContainer.appendChild(tile);
+                }
+            }
+        };
+
+        createTiles('tile-container-1', 'total-1');
+        createTiles('tile-container-2', 'total-2');
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                calculateTotal('tile-container-1', 'total-1');
+                calculateTotal('tile-container-2', 'total-2');
+            });
+        });
+    </script>
+</body>
+</html>
