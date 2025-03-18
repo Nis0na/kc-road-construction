@@ -7,22 +7,28 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            padding: 10px; /* Added padding for better mobile view */
-            box-sizing: border-box; /* Ensure padding is included in the width and height */
+        }
+        #map-container {
+            position: relative;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         #tile-container-1, #tile-container-2 {
             display: grid;
-            grid-template-columns: repeat(34, 50px);
+            grid-template-columns: repeat(24, 50px);
             grid-template-rows: repeat(9, 50px);
             gap: 2px;
             margin-bottom: 20px;
-            overflow-x: auto; /* Allow horizontal scrolling on mobile */
         }
         .tile {
             position: relative;
@@ -58,14 +64,6 @@
         .attribute-input {
             margin: 5px 0;
         }
-        @media (max-width: 600px) {
-            #total-1, #total-2 {
-                font-size: 18px; /* Adjusted font size for mobile */
-            }
-            .attribute-input {
-                font-size: 14px; /* Adjusted font size for mobile */
-            }
-        }
     </style>
 </head>
 <body>
@@ -82,21 +80,22 @@
             Feel free to share this website with others and give feedback to improve it to my discord: nis0na</p>
     </div>
     <div>
-        <label class="attribute-input">Intellect: <input type="number" id="intellect-input" value="1"></label>
-        <label class="attribute-input">Strength: <input type="number" id="strength-input" value="1"></label>
-        <label class="attribute-input">Charisma: <input type="number" id="charisma-input" value="1"></label>
+        <label class="attribute-input">Intellect: <input type="number" id="intellect-input" value="1"></label> <br>
+        <label class="attribute-input">Strength: <input type="number" id="strength-input" value="1"></label> <br>
+        <label class="attribute-input">Charisma: <input type="number" id="charisma-input" value="1"></label> <br>
         <label class="attribute-input">Leadership: <input type="number" id="leadership-input" value="1"></label>
     </div>
-    <div id="tile-container-1"></div>
-    <div id="total-1">Total Map 1: 0</div>
-    
-    <div id="tile-container-2"></div>
-    <div id="total-2">Total Map 2: 0</div>
-
+    <div id="map-container">
+        <div id="tile-container-1"></div>
+        <div id="total-1">Total Map 1: 0</div>
+        
+        <div id="tile-container-2"></div>
+        <div id="total-2">Total Map 2: 0</div>
+    </div>
     <script>
         const rows = 9;
-        const columns = 34;
-        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+        const columns = 24;
+        const alphabet = 'abcdefghijklmnopqrstuvwx';
         const values = {
             a: 1000000, b: 1600000, c: 2300000, d: 3000000, e: 6000000, f: 9000000, g: 12000000, h: 15000000, 
             i: 20000000, j: 25000000, k: 30000000, l: 35000000, m: 46000000, n: 57000000, o: 69000000, p: 82000000, 
@@ -147,11 +146,11 @@
         const createTiles = (containerId, totalId) => {
             const tileContainer = document.getElementById(containerId);
             for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < columns; j++) {
+                for (let x = 0; x < columns; x++) {
                     const tile = document.createElement('div');
                     tile.classList.add('tile');
                     const row = i + 1;
-                    const column = alphabet[j] || String.fromCharCode(97 + (j - 26));
+                    const column = alphabet[x];
                     const coordinate = column + row;
                     const value = values[column];
                     const attribute = attributeMap[coordinate];
@@ -183,6 +182,23 @@
             });
         });
     </script>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <p>Made by Nisona with love and alcohol</p>
+    <a href="https://github.com/Nis0na">My Github</a>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
 </body>
 </html>
